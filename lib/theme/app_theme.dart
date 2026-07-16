@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class AppColors {
-  static const Color primary = Color(0xFF0891B2); // teal-cyan (ishonch, tibbiyot)
+  static const Color primary = Color(
+    0xFF0891B2,
+  ); // teal-cyan (ishonch, tibbiyot)
   static const Color primaryDark = Color(0xFF0E7490);
   static const Color primaryLight = Color(0xFFE0F7FA);
   static const Color secondary = Color(0xFF10B981); // zumrad — muvaffaqiyat
@@ -58,8 +59,13 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          textStyle: GoogleFonts.inter(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
           elevation: 0,
         ),
       ),
@@ -78,7 +84,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.surface,

@@ -5,7 +5,6 @@ import '../services/gemini_service.dart';
 import '../state/app_state.dart';
 import '../theme/app_theme.dart';
 
-
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
 
@@ -20,7 +19,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
   bool _sending = false;
 
   String _buildContextSummary(AppState state) {
-    final domains = CognitiveDomain.values
+    final domains = trainedCognitiveDomains
         .map((d) => '${d.label}: ${(state.domainAccuracy(d) * 100).round()}%')
         .join(', ');
     return 'Kognitiv ball ${state.cognitiveScore}/100, streak ${state.streak} kun, '
@@ -30,6 +29,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
   Future<void> _send(AppState state) async {
     final text = _controller.text.trim();
     if (text.isEmpty || _sending) return;
+    final history = List<Map<String, String>>.from(_messages);
     setState(() {
       _messages.add({'role': 'user', 'text': text});
       _sending = true;
@@ -40,13 +40,14 @@ class _AiChatScreenState extends State<AiChatScreen> {
     final reply = await GeminiService.chatReply(
       userMessage: text,
       contextSummary: _buildContextSummary(state),
-      history: _messages,
+      history: history,
     );
 
+    if (!mounted) return;
     setState(() {
       _messages.add({
         'role': 'coach',
-        'text': reply ?? "Hozir javob bera olmadim — internet aloqasini tekshirib, qayta urinib ko'ring.",
+        'text': reply.text ?? 'AI xatosi: ${reply.error}',
       });
       _sending = false;
     });
@@ -56,9 +57,20 @@ class _AiChatScreenState extends State<AiChatScreen> {
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scroll.hasClients) {
-        _scroll.animateTo(_scroll.position.maxScrollExtent, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+        _scroll.animateTo(
+          _scroll.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scroll.dispose();
+    super.dispose();
   }
 
   @override
@@ -71,12 +83,23 @@ class _AiChatScreenState extends State<AiChatScreen> {
           child: Row(
             children: [
               Container(
-                width: 40, height: 40,
-                decoration: const BoxDecoration(color: AppColors.primaryLight, shape: BoxShape.circle),
-                child: const Icon(Icons.auto_awesome_rounded, color: AppColors.primary, size: 20),
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryLight,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
-              const Text('AI Coach bilan suhbat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const Text(
+                'AI Coach bilan suhbat',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              ),
             ],
           ),
         ),
@@ -88,31 +111,52 @@ class _AiChatScreenState extends State<AiChatScreen> {
                     child: Text(
                       'Kognitiv holatingiz, mashqlar yoki tavsiyalar haqida savol bering — AI Coach sizning haqiqiy statistikangizga qarab javob beradi.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 )
               : ListView.builder(
                   controller: _scroll,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
                   itemCount: _messages.length,
                   itemBuilder: (context, i) {
                     final m = _messages[i];
                     final isUser = m['role'] == 'user';
                     return Align(
-                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isUser
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Container(
                         margin: const EdgeInsets.symmetric(vertical: 6),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.75,
+                        ),
                         decoration: BoxDecoration(
                           color: isUser ? AppColors.primary : AppColors.surface,
-                          border: isUser ? null : Border.all(color: AppColors.border),
+                          border: isUser
+                              ? null
+                              : Border.all(color: AppColors.border),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
                           m['text'] ?? '',
-                          style: TextStyle(fontSize: 14, color: isUser ? Colors.white : AppColors.textPrimary, height: 1.4),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isUser
+                                ? Colors.white
+                                : AppColors.textPrimary,
+                            height: 1.4,
+                          ),
                         ),
                       ),
                     );
@@ -122,7 +166,11 @@ class _AiChatScreenState extends State<AiChatScreen> {
         if (_sending)
           const Padding(
             padding: EdgeInsets.only(bottom: 8),
-            child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
           ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -131,7 +179,11 @@ class _AiChatScreenState extends State<AiChatScreen> {
               Expanded(
                 child: TextField(
                   controller: _controller,
-                  decoration: const InputDecoration(hintText: 'Savolingizni yozing...'),
+                  maxLength: 1000,
+                  decoration: const InputDecoration(
+                    hintText: 'Savolingizni yozing...',
+                    counterText: '',
+                  ),
                   onSubmitted: (_) => _send(state),
                 ),
               ),
@@ -139,7 +191,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
               IconButton.filled(
                 onPressed: _sending ? null : () => _send(state),
                 icon: const Icon(Icons.send_rounded),
-                style: IconButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
               ),
             ],
           ),

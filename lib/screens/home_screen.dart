@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: state.load,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
         children: [
           Text('Xayrli kun, ${state.profile['name'] ?? ''} 👋'.trim(), style: const TextStyle(fontSize: 15, color: AppColors.textSecondary)),
           const SizedBox(height: 4),
@@ -34,7 +34,33 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          SectionCard(
+          const SizedBox(height: 18),
+          Container(
+            height: 150,
+
+
+
+
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFF0891B2),
+              boxShadow:[ BoxShadow(
+                  offset: const Offset(0, 5),
+                  color: Colors.black,
+
+
+                  spreadRadius: -2,
+                  blurRadius: 5
+              )],
+            ),
+
+            child: TextButton(
+              style: ElevatedButton.styleFrom(shape: CircleBorder(eccentricity: 0,)),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TrainingScreen())),
+              child: const Text('Go',style: TextStyle(color: Colors.white,fontSize: 40,fontWeight: FontWeight.bold),),
+            ),
+          ),
+          /*SectionCard(
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
@@ -52,17 +78,10 @@ class HomeScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                 ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TrainingScreen())),
-                    child: const Text('Mashqni boshlash'),
-                  ),
-                ),
+
               ],
             ),
-          ),
+          )*/
           const SizedBox(height: 20),
           _AiInsightCard(state: state),
           const SizedBox(height: 20),
@@ -72,10 +91,10 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               children: CognitiveDomain.values
                   .map((d) => ProgressBarRow(
-                        label: d.label,
-                        value: state.domainAccuracy(d),
-                        color: memoryStrengthColor(state.domainAccuracy(d)),
-                      ))
+                label: d.label,
+                value: state.domainAccuracy(d),
+                color: memoryStrengthColor(state.domainAccuracy(d)),
+              ))
                   .toList(),
             ),
           ),
@@ -108,7 +127,7 @@ class _AiInsightCardState extends State<_AiInsightCard> {
   Future<void> _fetchDeep() async {
     setState(() => _fetchingDeep = true);
     final deep = await AiCoachService.deepInsight(widget.state);
-    if (mounted) setState(() { _text = deep; _fetchingDeep = false; });
+    if (mounted) setState(() { _text = deep as String; _fetchingDeep = false; });
   }
 
   @override
@@ -142,3 +161,4 @@ class _AiInsightCardState extends State<_AiInsightCard> {
     );
   }
 }
+

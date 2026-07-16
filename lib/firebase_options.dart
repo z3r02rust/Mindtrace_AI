@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
@@ -17,13 +18,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-      apiKey: "AIzaSyB8yadGxwpzikH4tgH84k2SbYyXBpm6-JQ",
-      authDomain: "mindtrace-ai-3ee0c.firebaseapp.com",
-      projectId: "mindtrace-ai-3ee0c",
-      storageBucket: "mindtrace-ai-3ee0c.firebasestorage.app",
-      messagingSenderId: "770968981522",
-      appId: "1:770968981522:web:6133b3a579502fb38fc8cb",
-      measurementId: "G-7ND1X36YVZ"
+    apiKey: "AIzaSyB8yadGxwpzikH4tgH84k2SbYyXBpm6-JQ",
+    authDomain: "mindtrace-ai-3ee0c.firebaseapp.com",
+    projectId: "mindtrace-ai-3ee0c",
+    storageBucket: "mindtrace-ai-3ee0c.firebasestorage.app",
+    messagingSenderId: "770968981522",
+    appId: "1:770968981522:web:6133b3a579502fb38fc8cb",
+    measurementId: "G-7ND1X36YVZ",
   );
 
   static const FirebaseOptions android = FirebaseOptions(

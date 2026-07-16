@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/person.dart';
 import '../models/session.dart';
 
-
 class DatabaseService {
   final String uid;
   DatabaseService(this.uid);
@@ -10,8 +9,10 @@ class DatabaseService {
   DocumentReference<Map<String, dynamic>> get _userDoc =>
       FirebaseFirestore.instance.collection('users').doc(uid);
 
-  CollectionReference<Map<String, dynamic>> get _peopleRef => _userDoc.collection('people');
-  CollectionReference<Map<String, dynamic>> get _sessionsRef => _userDoc.collection('sessions');
+  CollectionReference<Map<String, dynamic>> get _peopleRef =>
+      _userDoc.collection('people');
+  CollectionReference<Map<String, dynamic>> get _sessionsRef =>
+      _userDoc.collection('sessions');
 
   // ---------- Odamlar (Person) ----------
 
@@ -31,7 +32,7 @@ class DatabaseService {
   // ---------- Mashg'ulot sessiyalari ----------
 
   Future<void> addSession(TrainingSession session) async {
-    await _sessionsRef.add(session.toJson());
+    await _sessionsRef.doc(session.id).set(session.toJson());
   }
 
   Future<List<TrainingSession>> loadSessions() async {
@@ -51,11 +52,20 @@ class DatabaseService {
     return doc.data()!.map((k, v) => MapEntry(k, v.toString()));
   }
 
-
   Future<void> savePeopleBatch(List<Person> people) async {
+    if (people.isEmpty) return;
     final batch = FirebaseFirestore.instance.batch();
     for (final p in people) {
       batch.set(_peopleRef.doc(p.id), p.toJson());
+    }
+    await batch.commit();
+  }
+
+  Future<void> saveSessionsBatch(List<TrainingSession> sessions) async {
+    if (sessions.isEmpty) return;
+    final batch = FirebaseFirestore.instance.batch();
+    for (final session in sessions) {
+      batch.set(_sessionsRef.doc(session.id), session.toJson());
     }
     await batch.commit();
   }

@@ -1,6 +1,5 @@
 import '../models/person.dart';
 
-
 class SpacedRepetitionService {
   static Person review(Person person, {required bool correct}) {
     // quality: 0-5 shkala, biz oddiy to'g'ri/noto'g'ri dan hosil qilamiz
@@ -33,13 +32,13 @@ class SpacedRepetitionService {
       repetitions: repetitions,
       nextReview: DateTime.now().add(Duration(days: interval)),
       lastReviewed: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
   }
 
   /// Bugun mashq qilinishi kerak bo'lgan (yoki hali umuman mashq qilinmagan)
   /// odamlar ro'yxati.
   static List<Person> dueToday(List<Person> people) {
-    final due = people.where((p) => p.isDue).toList();
-    return due.isNotEmpty ? due : people; // hech kim due bo'lmasa - hammasidan foydalan
+    return people.where((person) => person.isDue).toList();
   }
 }
